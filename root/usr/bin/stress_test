@@ -1,0 +1,141 @@
+#!/bin/bash
+
+TIMEOUT=600
+MAXTEMP=75
+
+args=`getopt qt:m: $*`
+set -- $args
+
+for i
+do 
+    case "$i" in
+	-q) shift; QUIET=1;;
+	-t) shift; TIMEOUT=$1; shift;;
+	-m) shift; MAXTEMP=$1; shift;;
+    esac
+done
+
+PROCLOOP=`mktemp`
+CHECKLOOP=`mktemp`
+
+echo 1 > ${PROCLOOP}
+echo 1 > ${CHECKLOOP}
+
+trap 'cat /dev/null > $CHECKLOOP' SIGHUP SIGINT SIGTERM
+
+if [[ ! -e `which octave` ]]; then
+  echo "Octave not installed. Please apt-get install octave." >&2
+  exit -1
+fi
+
+[[ $QUIET ]] || echo "Starting Octave processes..."
+for i in {1..8}; do
+  (while [ -s $PROCLOOP ]; do nice -n 20 octave --eval "a=rand(2000);det(a);a=inv(a);"; done) > /dev/null 2>&1 &
+done
+
+[[ $QUIET ]] || echo "Starting yes processes..."
+for i in {1..8}; do
+  nice -n 20 yes > /dev/null 2>&1 &
+done
+
+[[ $QUIET ]] || echo "Starting dd in 5 seconds so that other processes can finish loading..."
+sleep 5
+for d in /dev/sd? /dev/hd?; do
+  if [[ -b $d ]]; then
+    [[ $QUIET ]] || echo Starting dd on $d now...
+    (while [ -s $PROCLOOP ]; do test -e $d && nice -n 20 dd if=$d of=/dev/null; sleep 10; done) > /dev/null 2>&1 &
+    (while [ -s $PROCLOOP ]; do test -e $d && nice -n 20 dd if=$d of=/dev/null skip=20000 bs=1000000; sleep 10; done) > /dev/null 2>&1 &
+  fi
+done
+
+#(while true; do netperf -t UDP_STREAM -H pre1; done) &
+
+c1tempmax=0
+c2tempmax=0
+c1temp=0
+c2temp=0
+res=0
+
+endtime=$((`date +%s` + ${TIMEOUT}))
+
+while [ `date +%s` -lt $endtime ]; do
+    if [ ! -s $CHECKLOOP ]; then
+	break
+    fi
+    c1temp=`sudo ipmitool sdr | sed -nre 's/^CPU1 Temp\s*\|\s*([0-9]+) degrees C.*$/\1/p'`
+    if [ -z "$c1temp" ]; then
+	echo "Cannot read CPU1 temperature!" >&2
+	break
+    fi
+    [ $c1tempmax -gt $c1temp ] || c1tempmax=$c1temp
+
+    c2temp=`sudo ipmitool sdr | sed -nre 's/^CPU1 Temp\s*\|\s*([0-9]+) degrees C.*$/\1/p'`
+    if [ -z "$c2temp" ]; then
+	echo "Cannot read CPU2 temperature!" >&2
+	break
+    fi
+    [ $c2tempmax -gt $c2temp ] || c2tempmax=$c2temp
+
+    if [ $c1temp -gt $MAXTEMP ]; then
+	echo "CPU1 temperature reached ${c1temp}.  Above max: ${MAXTEMP}.  Terminating." >&2
+	res=1
+	break
+    fi
+
+    if [ $c2temp -gt $MAXTEMP ]; then
+	echo "CPU2 temperature reached ${c2temp}.  Above max: ${MAXTEMP}.  Terminating." >&2
+	res=1
+	break
+    fi
+
+
+    [[ $QUIET ]] || echo "Current Temp CPU1=${c1temp}, CPU2=${c2temp}"
+    sleep 1
+done
+
+# Removing the PROCLOOP will cause our loops to terminate
+cat /dev/null > ${PROCLOOP}
+
+[[ $QUIET ]] || echo "Killing all remaining jobs, and waiting for them to die..."
+for s in `jobs -p`; do
+    # Kill sub-processes as appropriate
+    for t in `ps h --ppid $s -o pid`; do
+	name=`ps h --pid $t -o ucmd`
+	kill -9 $t
+    done
+
+    # Kill instances of yes
+    name=`ps h --pid $s -o ucmd`
+    if [ "${name}" = "yes" ]; then
+	kill $s
+    fi
+done
+
+# Wait for our loops to all return
+[[ $QUIET ]] || echo "Waiting for jobs to die..."
+wait
+
+jdd=`ps h -C dd | grep -v klogd`
+joct=`ps h -C octave`
+jyes=`ps h -C yes`
+
+if [ ! -z "${jdd}${joct}${jyes}" ]; then
+IFS="
+"
+    echo "If any jobs are listed below, they may need to be killed by hand."
+    for p in ${jdd} ${joct} ${jyes}; do
+	echo " * ${p}"
+    done
+unset IFS
+fi
+
+rm ${CHECKLOOP}
+rm ${PROCLOOP}
+
+if [ "${res}" = "0" ]; then
+    echo "Max Temp CPU1=${c1tempmax}, CPU2=${c2tempmax}"
+else
+    echo "Max Temp CPU1=${c1tempmax}, CPU2=${c2tempmax}" >&2
+fi
+
+exit ${res}

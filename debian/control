@@ -1,0 +1,13 @@
+Source: pr2-stress
+Section: config
+Priority: extra
+Maintainer: Jeremy Leibs <leibs@willowgarage.com>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.7.2
+
+Package: pr2-stress
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, octave3.2, ipmitool
+Description: Provides a script which stress tests the pr2
+Provides: ${diverted-files}
+Conflicts: ${diverted-files}

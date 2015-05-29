@@ -1,0 +1,69 @@
+pr2-stress (0.5.2-precise) stable; urgency=low
+
+  * Incrementing to SVN: r885
+   - r885: added precise support.
+
+ -- Michael Brindle <mbrindle@willowgarage.com>  Wed, 11 Jul 2012 16:26:21 -0700
+
+pr2-stress (0.5.0-precise) stable; urgency=low
+
+  * Incrementing to SVN: r143
+
+ -- Jeremy Leibs <leibs@willowgarage.com>  Tue, 12 Oct 2010 16:09:48 -0700
+
+pr2-stress (0.1.7-precise) stable; urgency=low
+
+  * Incrementing to SVN: r401
+   - r401: Changing stress_test output to be more nicely usable from pr2-systemcheck.
+
+ -- Jeremy Leibs <leibs@willowgarage.com>  Mon, 14 Dec 2009 14:00:14 -0800
+
+pr2-stress (0.1.6-precise) stable; urgency=low
+
+  * Incrementing to SVN: r379
+   - r379: Changing the final output of the stresstest.
+
+ -- Jeremy Leibs <leibs@willowgarage.com>  Fri, 04 Dec 2009 16:43:54 -0800
+
+pr2-stress (0.1.5-precise) stable; urgency=low
+
+  * Incrementing to SVN: r378
+   - r378: Changing the stress test to use more deterministic timing.
+
+ -- Jeremy Leibs <leibs@willowgarage.com>  Fri, 04 Dec 2009 12:37:10 -0800
+
+pr2-stress (0.1.4-precise) stable; urgency=low
+
+  * Incrementing to SVN: r375
+   - r375: Terminating if temperature can't be read.
+
+ -- Jeremy Leibs <leibs@willowgarage.com>  Fri, 04 Dec 2009 02:28:45 -0800
+
+pr2-stress (0.1.3-precise) stable; urgency=low
+
+  * Incrementing to SVN: r374
+   - r374: Better handling for sensors without proper readings.
+
+ -- Jeremy Leibs <leibs@willowgarage.com>  Fri, 04 Dec 2009 02:20:24 -0800
+
+pr2-stress (0.1.2-precise) stable; urgency=low
+
+  * Incrementing to SVN: r373
+   - r373: Upping max temp in stress test.
+
+ -- Jeremy Leibs <leibs@willowgarage.com>  Fri, 04 Dec 2009 02:04:13 -0800
+
+pr2-stress (0.1.1-precise) stable; urgency=low
+
+  * Incrementing to SVN: r368
+   - r367: Initial checkin of pr2-stress.
+   - r368: Fixing some typos.
+
+ -- Jeremy Leibs <leibs@willowgarage.com>  Fri, 04 Dec 2009 01:00:21 -0800
+
+pr2-stress (0.1-precise) stable; urgency=low
+
+  * Initial release. 
+  * Creating the package
+
+ -- Jeremy Leibs <leibs@willowgarage.com>  Fri, 04 Dec 2009 00:54:06 -0800
