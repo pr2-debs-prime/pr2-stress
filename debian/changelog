@@ -1,4 +1,4 @@
-pr2-stress (0.5.2-precise) stable; urgency=low
+pr2-stress (0.5.2-xenial) stable; urgency=low
 
   * Incrementing to SVN: r885
    - r885: added precise support.
