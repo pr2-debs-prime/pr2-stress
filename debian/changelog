@@ -1,9 +1,13 @@
 pr2-stress (0.5.2-xenial) stable; urgency=low
 
+  [ Michael Brindle ]
   * Incrementing to SVN: r885
    - r885: added precise support.
 
- -- Michael Brindle <mbrindle@willowgarage.com>  Wed, 11 Jul 2012 16:26:21 -0700
+  [ David Feil-Seifer ]
+  * updating for xenial packaging
+
+ -- David Feil-Seifer <dfseifer@newnewcharles>  Mon, 18 Mar 2019 12:58:11 -0700
 
 pr2-stress (0.5.0-precise) stable; urgency=low
 
